@@ -8,8 +8,40 @@ export default class Form extends Component {
         this.state = {
             name: '',
             price: 0,
-            imgUrl: ''
+            imgUrl: '',
         }
+    }
+
+    componentDidUpdate(prevProps) {
+        if(prevProps.currentProduct.name !== this.props.currentProduct.name) {
+            this.setState({
+                name: this.props.currentProduct.name,
+                price: this.props.currentProduct.price,
+                imgUrl: this.props.currentProduct.imgUrl
+            })
+        }
+    }
+
+    updateProduct = () => {
+        const { id } = this.props.currentProduct
+        let { name, price, imgUrl } = this.state
+        let updatedProduct = {
+            name,
+            price,
+            imgUrl
+        }
+        this.props.updateProduct(id, updatedProduct)
+    }
+
+    createProduct = () => {
+        let newProduct = this.state
+        this.props.createProduct(newProduct)
+        
+        this.setState({
+            name: '',
+            price: 0,
+            imgUrl: ''
+        })
     }
 
     handleInput = e => {
@@ -22,7 +54,8 @@ export default class Form extends Component {
 
 
     render() {
-        let defaultImage = this.state.imgUrl === '' ? 'https://via.placeholder.com/150x100' : this.state.imgUrl
+        let defaultImage = this.state.imgUrl === '' ? 'https://via.placeholder.com/150x100?text=Image' : this.state.imgUrl
+        const {editting} = this.props
         return (
             <div className='form'>
                 <img style={{height:'100px', width:'80%', alignSelf:'center'}}src={defaultImage} alt="product" />
@@ -45,8 +78,12 @@ export default class Form extends Component {
                     value={this.state.price}
                     onChange={this.handleInput}/>
                 <span>
-                    <button>Cancel</button>
-                    <button>Add to Inventory</button>
+                    <button onClick={()=> this.setState({name:'', price:0, imgUrl:''})}>Cancel</button>
+                    {editting ? (
+                        <button onClick={this.updateProduct}>Update Inventory</button>
+                    ) : (
+                        <button onClick={this.createProduct}>Add to Inventory</button>
+                    )}
                 </span>
             </div>
         )
